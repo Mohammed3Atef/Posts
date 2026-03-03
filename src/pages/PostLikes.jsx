@@ -1,0 +1,84 @@
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import Loader from '../components/Loader';
+import Pagination from '../components/Pagination';
+import { getPostLikes } from '../api/postsApi';
+import { useToast } from '../context/ToastContext';
+import { getErrorMessage } from '../utils/errorMessage';
+
+function PostLikes() {
+  const { postId } = useParams();
+  const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(20);
+  const [hasNext, setHasNext] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
+
+  const loadLikes = async (selectedPage = 1) => {
+    setLoading(true);
+    try {
+      const result = await getPostLikes(postId, { page: selectedPage, limit });
+      const list = result?.data?.likes || result?.likes || result?.data || [];
+      const nextUsers = Array.isArray(list) ? list : [];
+      setUsers(nextUsers);
+      const numberOfPages = result?.meta?.pagination?.numberOfPages || 1;
+      const currentPage = result?.meta?.pagination?.currentPage || selectedPage;
+      setHasNext(currentPage < numberOfPages);
+      setPage(currentPage);
+    } catch (error) {
+      showToast('error', getErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLikes(1);
+  }, [postId]);
+
+  if (loading) return <Loader text="Loading likes..." />;
+
+  return (
+    <section className="space-y-4">
+      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+          <h1 className="text-xl font-bold text-slate-800">People who reacted</h1>
+          <Link className="text-sm font-medium text-slate-500 hover:text-indigo-600" to={`/posts/${postId}`}>
+            Close
+          </Link>
+        </div>
+
+        {users.length === 0 ? (
+          <div className="px-4 py-6 text-sm text-slate-600">No likes yet.</div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {users.map((user) => (
+              <article key={user?._id || user?.id} className="px-4 py-3">
+                <div className="flex items-center gap-3">
+                  {user?.photo ? (
+                    <img src={user.photo} alt={user?.name || 'User'} className="h-11 w-11 rounded-full object-cover" />
+                  ) : (
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-slate-600">
+                      {user?.name?.[0] || 'U'}
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-medium text-slate-800">{user?.name || 'Unknown user'}</p>
+                    <p className="text-sm text-slate-500">@{user?.username || 'route-user'}</p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {users.length > 0 ? (
+        <Pagination page={page} onPageChange={loadLikes} hasNext={hasNext} canGoBack={page > 1} />
+      ) : null}
+    </section>
+  );
+}
+
+export default PostLikes;
