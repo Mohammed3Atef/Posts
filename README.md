@@ -11,15 +11,11 @@ npm run dev
 
 Then open the URL shown by Vite (usually `http://localhost:5173`).
 
-## 2) Environment variable
+## 2) API base URL
 
-Create a `.env` file in the project root:
+The API URL is hardcoded directly in `src/api/axiosInstance.js`:
 
-```env
-VITE_API_BASE_URL=https://route-posts.routemisr.com
-```
-
-This value is used in `src/api/axiosInstance.js`.
+`https://route-posts.routemisr.com`
 
 ## 3) How auth works
 

@@ -37,22 +37,22 @@ function EditPost() {
 
   return (
     <section className="mx-auto max-w-2xl">
-      <div className="card">
-        <h1 className="mb-2 text-2xl font-bold text-slate-800">Edit Post</h1>
+      <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-sm">
+        <h1 className="mb-2 text-2xl font-bold text-white">Edit Post</h1>
         {!post ? (
-          <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+          <p className="mb-4 rounded-lg border border-amber-700 bg-amber-900/40 p-3 text-sm text-amber-200">
             Post preview was not passed from Home page. You can still submit new text to update the post.
           </p>
         ) : null}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="label" htmlFor="body">
+            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="body">
               Post Content
             </label>
             <textarea
               id="body"
-              className="input min-h-32"
+              className="min-h-32 w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500"
               value={body}
               onChange={(event) => setBody(event.target.value)}
               placeholder="Update your post..."
@@ -60,23 +60,23 @@ function EditPost() {
           </div>
 
           <div>
-            <label className="label" htmlFor="image">
+            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="image">
               Optional New Image
             </label>
             <input
               id="image"
               type="file"
               accept="image/*"
-              className="input cursor-pointer"
+              className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-slate-200 outline-none transition file:mr-2 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-white hover:file:bg-blue-700"
               onChange={(event) => setImage(event.target.files?.[0] || null)}
             />
           </div>
 
           <div className="flex gap-2">
-            <button className="btn-primary flex-1 py-2.5 text-sm disabled:opacity-50" disabled={loading}>
+            <button className="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50" disabled={loading}>
               {loading ? 'Updating...' : 'Update Post'}
             </button>
-            <Link className="btn-secondary px-4 py-2.5 text-sm" to="/">
+            <Link className="rounded-lg border border-slate-600 bg-slate-700 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-600" to="/">
               Cancel
             </Link>
           </div>

@@ -1,9 +1,11 @@
 import axiosInstance from './axiosInstance';
 
-export const getNotifications = async ({ page = 1, limit = 20 } = {}) => {
-  const response = await axiosInstance.get('/notifications', {
-    params: { page, limit },
-  });
+export const getNotifications = async ({ unread, page = 1, limit = 20 } = {}) => {
+  const params = { page, limit };
+  if (typeof unread === 'boolean') {
+    params.unread = unread;
+  }
+  const response = await axiosInstance.get('/notifications', { params });
   return response.data;
 };
 

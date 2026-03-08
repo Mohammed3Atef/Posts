@@ -19,7 +19,6 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
   };
 
-  // If we already have a token, load profile once on app startup.
   useEffect(() => {
     const loadProfile = async () => {
       if (!token) {

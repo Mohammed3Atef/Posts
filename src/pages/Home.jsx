@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ConfirmDialog from "../components/ConfirmDialog";
 import Loader from "../components/Loader";
 import Pagination from "../components/Pagination";
 import PostCard from "../components/PostCard";
-import { getSuggestions } from "../api/authApi";
+import { getSuggestions, toggleFollowUser } from "../api/authApi";
 import {
+  createPost,
   deletePost,
   getAllPosts,
+  getBookmarkedPosts,
   getPostsFeed,
-  sharePost,
   toggleBookmark,
   togglePostLike,
 } from "../api/postsApi";
@@ -17,23 +18,27 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { getErrorMessage, getUserId } from "../utils/errorMessage";
 
-const extractPosts = (result) => {
-  const posts = result?.data?.posts || result?.posts || result?.data || [];
-  return Array.isArray(posts) ? posts : [];
-};
-
 function Home() {
   const fallbackAvatar =
     "https://pub-3cba56bacf9f4965bbb0989e07dada12.r2.dev/linkedPosts/default-profile.png";
   const [posts, setPosts] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(20);
   const [hasNext, setHasNext] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [feedOnly, setFeedOnly] = useState("");
+  const [feedOnly, setFeedOnly] = useState("following");
   const [deletePostId, setDeletePostId] = useState("");
+  const [followLoadingId, setFollowLoadingId] = useState("");
+  const [followingMap, setFollowingMap] = useState({});
+  const [composerBody, setComposerBody] = useState("");
+  const [composerImage, setComposerImage] = useState(null);
+  const [posting, setPosting] = useState(false);
+  const [feelingModalOpen, setFeelingModalOpen] = useState(false);
+  const [feelingText, setFeelingText] = useState("");
+  const [feelingEmoji, setFeelingEmoji] = useState("😊");
+  const imageInputRef = useRef(null);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -43,18 +48,36 @@ function Home() {
     setLoading(true);
     try {
       let result;
-      try {
-        result = await getPostsFeed({
+      if (onlyValue === "saved") {
+        result = await getBookmarkedPosts({
           page: selectedPage,
           limit,
-          only: onlyValue,
         });
-      } catch (error) {
-        // Fallback if feed endpoint shape differs: fetch all posts.
-        result = await getAllPosts();
+      } else {
+        try {
+          result = await getPostsFeed({
+            page: selectedPage,
+            limit,
+            only: onlyValue,
+          });
+        } catch (error) {
+          result = await getAllPosts();
+        }
       }
 
-      const nextPosts = extractPosts(result);
+      const bookmarkPosts =
+        result?.data?.bookmarks ||
+        result?.bookmarks ||
+        result?.data?.posts ||
+        result?.posts ||
+        result?.data ||
+        [];
+      const nextPosts =
+        onlyValue === "saved"
+          ? (Array.isArray(bookmarkPosts) ? bookmarkPosts : [])
+          : (Array.isArray(result?.data?.posts || result?.posts || result?.data || [])
+            ? (result?.data?.posts || result?.posts || result?.data || [])
+            : []);
       const numberOfPages = result?.meta?.pagination?.numberOfPages || 1;
       const currentPage = result?.meta?.pagination?.currentPage || selectedPage;
 
@@ -74,15 +97,38 @@ function Home() {
       const result = await getSuggestions({ page: 1, limit: 5 });
       const list =
         result?.data?.suggestions || result?.suggestions || result?.data || [];
-      setSuggestions(Array.isArray(list) ? list : []);
+      const nextSuggestions = Array.isArray(list) ? list : [];
+      setSuggestions(nextSuggestions);
+      const map = {};
+      nextSuggestions.forEach((item) => {
+        const id = item?._id || item?.id;
+        if (id) {
+          map[id] = Boolean(item?.isFollowing);
+        }
+      });
+      setFollowingMap(map);
     } catch (error) {
-      // Do not block feed rendering if suggestions fail.
       setSuggestions([]);
     }
   };
 
+  const handleFollowToggle = async (event, userId) => {
+    event.stopPropagation();
+    if (!userId) return;
+    setFollowLoadingId(userId);
+    try {
+      await toggleFollowUser(userId);
+      setFollowingMap((prev) => ({ ...prev, [userId]: !prev[userId] }));
+      showToast("success", "Follow status updated.");
+    } catch (error) {
+      showToast("error", getErrorMessage(error));
+    } finally {
+      setFollowLoadingId("");
+    }
+  };
+
   useEffect(() => {
-    loadPosts(1);
+    loadPosts(1, "following");
     loadSuggestionsPreview();
   }, []);
 
@@ -118,14 +164,39 @@ function Home() {
     }
   };
 
-  const handleSharePost = async (postId) => {
+  const handleCreatePost = async () => {
+    const text = composerBody.trim();
+    if (!text && !composerImage) {
+      showToast("error", "Write something or choose an image first.");
+      return;
+    }
+
+    setPosting(true);
     try {
-      await sharePost(postId, "Shared from my feed");
-      showToast("success", "Post shared successfully.");
-      loadPosts(page, feedOnly);
+      await createPost({ body: text || " ", image: composerImage });
+      setComposerBody("");
+      setComposerImage(null);
+      if (imageInputRef.current) {
+        imageInputRef.current.value = "";
+      }
+      showToast("success", "Post created successfully.");
+      await loadPosts(1, feedOnly);
     } catch (error) {
       showToast("error", getErrorMessage(error));
+    } finally {
+      setPosting(false);
     }
+  };
+
+  const appendFeelingToComposer = () => {
+    const trimmedFeeling = feelingText.trim();
+    const feelingValue = trimmedFeeling
+      ? `${feelingEmoji} ${trimmedFeeling}`
+      : feelingEmoji;
+    setComposerBody((prev) => `${prev}${prev ? " " : ""}${feelingValue}`);
+    setFeelingModalOpen(false);
+    setFeelingText("");
+    setFeelingEmoji("😊");
   };
 
   if (loading) {
@@ -134,23 +205,31 @@ function Home() {
 
   return (
     <section className="space-y-4">
-      <div className="feed-layout">
-        <aside className="panel-card sticky-panel hidden xl:block">
-          <h2 className="mb-3 text-sm font-semibold text-slate-700">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[220px_minmax(0,1fr)_300px]">
+        <aside className="sticky top-20 hidden h-fit self-start rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm xl:block">
+          <h2 className="mb-3 text-sm font-semibold text-white">
             Feed Sections
           </h2>
           <div className="space-y-2">
             <button
-              className={`side-nav-item ${feedOnly === "" ? "active" : ""}`}
+              className={`w-full rounded-lg px-3 py-2 text-left text-sm transition ${
+                feedOnly === "following"
+                  ? "bg-blue-600 text-white"
+                  : "text-slate-300 hover:bg-slate-700 hover:text-white"
+              }`}
               onClick={() => {
-                setFeedOnly("");
-                loadPosts(1, "");
+                setFeedOnly("following");
+                loadPosts(1, "following");
               }}
             >
               Feed
             </button>
             <button
-              className={`side-nav-item ${feedOnly === "me" ? "active" : ""}`}
+              className={`w-full rounded-lg px-3 py-2 text-left text-sm transition ${
+                feedOnly === "me"
+                  ? "bg-blue-600 text-white"
+                  : "text-slate-300 hover:bg-slate-700 hover:text-white"
+              }`}
               onClick={() => {
                 setFeedOnly("me");
                 loadPosts(1, "me");
@@ -159,19 +238,27 @@ function Home() {
               My Posts
             </button>
             <button
-              className={`side-nav-item ${feedOnly === "following" ? "active" : ""}`}
+              className={`w-full rounded-lg px-3 py-2 text-left text-sm transition ${
+                feedOnly === "all"
+                  ? "bg-blue-600 text-white"
+                  : "text-slate-300 hover:bg-slate-700 hover:text-white"
+              }`}
               onClick={() => {
-                setFeedOnly("following");
-                loadPosts(1, "following");
+                setFeedOnly("all");
+                loadPosts(1, "all");
               }}
             >
               Community
             </button>
             <button
-              className={`side-nav-item ${feedOnly === "bookmarks" ? "active" : ""}`}
+              className={`w-full rounded-lg px-3 py-2 text-left text-sm transition ${
+                feedOnly === "saved"
+                  ? "bg-blue-600 text-white"
+                  : "text-slate-300 hover:bg-slate-700 hover:text-white"
+              }`}
               onClick={() => {
-                setFeedOnly("bookmarks");
-                loadPosts(1, "bookmarks");
+                setFeedOnly("saved");
+                loadPosts(1, "saved");
               }}
             >
               Saved
@@ -180,44 +267,68 @@ function Home() {
         </aside>
 
         <div className="space-y-4">
-          <div className="panel-card">
+          <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm">
             <div className="mb-3 flex items-center gap-3">
               <img
                 src={user?.photo || fallbackAvatar}
                 alt="User"
-                className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+                className="h-10 w-10 rounded-full border border-slate-600 object-cover"
               />
               <div>
-                <p className="text-sm font-semibold text-slate-800">
+                <p className="text-sm font-semibold text-white">
                   {user?.name || "User"}
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-400">
                   @{user?.username || "username"}
                 </p>
               </div>
             </div>
             <textarea
-              className="input min-h-24"
+              className="min-h-24 w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white outline-none"
               placeholder={`What's on your mind, ${user?.name || "friend"}?`}
-              readOnly
+              value={composerBody}
+              onChange={(event) => setComposerBody(event.target.value)}
             />
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(event) => setComposerImage(event.target.files?.[0] || null)}
+            />
+            {composerImage ? (
+              <p className="mt-2 text-xs text-slate-300">Selected image: {composerImage.name}</p>
+            ) : null}
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span>Photo/video</span>
-                <span>Feeling/activity</span>
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <button
+                  type="button"
+                  className="rounded-md px-2 py-1 transition hover:bg-slate-700 hover:text-white"
+                  onClick={() => imageInputRef.current?.click()}
+                >
+                  Photo/video
+                </button>
+                <button
+                  type="button"
+                  className="rounded-md px-2 py-1 transition hover:bg-slate-700 hover:text-white"
+                  onClick={() => setFeelingModalOpen(true)}
+                >
+                  Feeling/activity
+                </button>
               </div>
               <button
-                className="btn-primary px-4 py-2 text-sm"
-                onClick={() => navigate("/posts/new")}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-60"
+                onClick={handleCreatePost}
+                disabled={posting}
               >
-                Post
+                {posting ? "Posting..." : "Post"}
               </button>
             </div>
           </div>
 
           {posts.length === 0 ? (
-            <div className="card text-center">
-              <p className="text-slate-600">No posts found yet.</p>
+            <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
+              <p className="text-slate-300">No posts found yet.</p>
             </div>
           ) : (
             posts.map((post) => (
@@ -228,7 +339,7 @@ function Home() {
                 onDelete={setDeletePostId}
                 onLike={handleToggleLike}
                 onBookmark={handleToggleBookmark}
-                onShare={handleSharePost}
+                onUpdate={() => loadPosts(page, feedOnly)}
               />
             ))
           )}
@@ -242,18 +353,18 @@ function Home() {
             />
           ) : null}
           {posts.length > 0 ? (
-            <p className="text-center text-xs text-slate-500">
+            <p className="text-center text-xs text-slate-400">
               Page {page} of {totalPages}
             </p>
           ) : null}
         </div>
 
-        <aside className="panel-card sticky-panel hidden lg:block">
+        <aside className="sticky top-20 hidden h-fit self-start rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm lg:block">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-700">
+            <h2 className="text-sm font-semibold text-white">
               Suggested Friends
             </h2>
-            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
+            <span className="rounded-md bg-slate-700 px-2 py-0.5 text-xs text-slate-300">
               {suggestions.length}
             </span>
           </div>
@@ -263,7 +374,7 @@ function Home() {
               return (
                 <div
                   key={suggestionId}
-                  className="cursor-pointer rounded-lg border border-slate-200 p-2 transition hover:bg-slate-50"
+                  className="cursor-pointer rounded-lg border border-slate-700 p-2 transition hover:bg-slate-700"
                   onClick={() =>
                     suggestionId && navigate(`/users/${suggestionId}/profile`)
                   }
@@ -275,28 +386,34 @@ function Home() {
                       className="h-9 w-9 rounded-full object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-slate-800">
+                      <p className="truncate text-sm font-medium text-white">
                         {item?.name || "User"}
                       </p>
-                      <p className="truncate text-xs text-slate-500">
+                      <p className="truncate text-xs text-slate-400">
                         @{item?.username || "route-user"}
                       </p>
                     </div>
                     <button
-                      className="btn-secondary px-2 py-1 text-xs"
-                      onClick={(event) => event.stopPropagation()}
+                      className="rounded-lg border border-slate-600 bg-slate-700 px-2 py-1 text-xs font-medium text-slate-200 transition hover:bg-slate-600"
+                      onClick={(event) =>
+                        handleFollowToggle(event, item?._id || item?.id)
+                      }
                     >
-                      Follow
+                      {followLoadingId === (item?._id || item?.id)
+                        ? "Saving..."
+                        : followingMap[item?._id || item?.id]
+                        ? "Following"
+                        : "Follow"}
                     </button>
                   </div>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-400">
                     {item?.followersCount || 0} followers
                   </p>
                 </div>
               );
             })}
             {suggestions.length === 0 ? (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-400">
                 No suggestions right now.
               </p>
             ) : null}
@@ -312,6 +429,67 @@ function Home() {
         onCancel={() => setDeletePostId("")}
         onConfirm={handleDeleteConfirmed}
       />
+
+      {feelingModalOpen ? (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/70 p-4"
+          onClick={() => setFeelingModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-lg"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3 className="text-base font-semibold text-white">
+              How are you feeling?
+            </h3>
+            <p className="mt-1 text-xs text-slate-400">
+              Pick an emoji and write a short feeling.
+            </p>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {["😊", "😄", "😍", "😎", "🥳", "😴", "😢", "🔥"].map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  className={`rounded-md border px-2 py-1 text-base transition ${
+                    feelingEmoji === emoji
+                      ? "border-blue-500 bg-blue-600/20"
+                      : "border-slate-600 hover:bg-slate-700"
+                  }`}
+                  onClick={() => setFeelingEmoji(emoji)}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+
+            <input
+              type="text"
+              className="mt-3 w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500"
+              placeholder="Type your feeling..."
+              value={feelingText}
+              onChange={(event) => setFeelingText(event.target.value)}
+            />
+
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-lg border border-slate-600 bg-slate-700 px-3 py-1.5 text-sm font-medium text-slate-200 transition hover:bg-slate-600"
+                onClick={() => setFeelingModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-blue-700"
+                onClick={appendFeelingToComposer}
+              >
+                Add feeling
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -1,10 +1,9 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: 'https://route-posts.routemisr.com',
 });
 
-// Attach token to every protected request if user is logged in.
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
 

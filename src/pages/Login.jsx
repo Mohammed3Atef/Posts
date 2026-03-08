@@ -44,17 +44,17 @@ function Login() {
 
   return (
     <section className="mx-auto max-w-xl">
-      <div className="card">
-        <h1 className="mb-2 text-2xl font-bold text-slate-800">Login</h1>
-        <p className="mb-6 text-sm text-slate-500">Enter your credentials to continue.</p>
+      <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-sm">
+        <h1 className="mb-2 text-2xl font-bold text-white">Login</h1>
+        <p className="mb-6 text-sm text-slate-400">Enter your credentials to continue.</p>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="label" htmlFor="email">
+            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="email">
               Email
             </label>
             <input
-              className="input"
+              className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500"
               id="email"
               type="email"
               value={formData.email}
@@ -63,11 +63,11 @@ function Login() {
           </div>
 
           <div>
-            <label className="label" htmlFor="password">
+            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="password">
               Password
             </label>
             <input
-              className="input"
+              className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500"
               id="password"
               type="password"
               value={formData.password}
@@ -75,14 +75,14 @@ function Login() {
             />
           </div>
 
-          <button className="btn-primary w-full py-2.5 text-sm disabled:opacity-50" disabled={loading}>
+          <button className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
-        <p className="mt-4 text-sm text-slate-600">
+        <p className="mt-4 text-sm text-slate-300">
           New here?{' '}
-          <Link to="/signup" className="font-medium text-indigo-600 hover:underline">
+          <Link to="/signup" className="font-medium text-blue-400 hover:underline">
             Create an account
           </Link>
         </p>

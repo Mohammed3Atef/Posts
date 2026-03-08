@@ -33,18 +33,18 @@ function CreatePost() {
 
   return (
     <section className="mx-auto max-w-2xl">
-      <div className="card">
-        <h1 className="mb-2 text-2xl font-bold text-slate-800">Create Post</h1>
-        <p className="mb-6 text-sm text-slate-500">Share what is on your mind.</p>
+      <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-sm">
+        <h1 className="mb-2 text-2xl font-bold text-white">Create Post</h1>
+        <p className="mb-6 text-sm text-slate-400">Share what is on your mind.</p>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="label" htmlFor="body">
+            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="body">
               Post Content
             </label>
             <textarea
               id="body"
-              className="input min-h-32"
+              className="min-h-32 w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500"
               value={body}
               onChange={(event) => setBody(event.target.value)}
               placeholder="Write your post..."
@@ -52,19 +52,19 @@ function CreatePost() {
           </div>
 
           <div>
-            <label className="label" htmlFor="image">
+            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="image">
               Optional Image
             </label>
             <input
               id="image"
               type="file"
               accept="image/*"
-              className="input cursor-pointer"
+              className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-slate-200 outline-none transition file:mr-2 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-white hover:file:bg-blue-700"
               onChange={(event) => setImage(event.target.files?.[0] || null)}
             />
           </div>
 
-          <button className="btn-primary w-full py-2.5 text-sm disabled:opacity-50" disabled={loading}>
+          <button className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50" disabled={loading}>
             {loading ? 'Creating...' : 'Create Post'}
           </button>
         </form>

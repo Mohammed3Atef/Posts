@@ -11,7 +11,6 @@ import Notifications from './pages/Notifications';
 import PostDetails from './pages/PostDetails';
 import PostLikes from './pages/PostLikes';
 import Profile from './pages/Profile';
-import Replies from './pages/Replies';
 import Signup from './pages/Signup';
 import Suggestions from './pages/Suggestions';
 import UserProfile from './pages/UserProfile';
@@ -21,7 +20,7 @@ function App() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-900">
       <Navbar />
 
       <main className="mx-auto w-full max-w-6xl px-3 py-4 sm:px-4 sm:py-6">
@@ -66,14 +65,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <PostLikes />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/posts/:postId/comments/:commentId/replies"
-            element={
-              <ProtectedRoute>
-                <Replies />
               </ProtectedRoute>
             }
           />

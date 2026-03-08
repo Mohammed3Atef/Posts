@@ -26,16 +26,22 @@ export const getAllPosts = async () => {
 
 export const getBookmarkedPosts = async ({ page = 1, limit = 20 } = {}) => {
   try {
-    const response = await axiosInstance.get('/posts/bookmarks', {
+    const response = await axiosInstance.get('/users/bookmarks', {
       params: { page, limit },
     });
     return response.data;
   } catch (error) {
-    // Fallback for deployments using feed filtering instead.
-    const response = await axiosInstance.get('/posts/feed', {
-      params: { page, limit, only: 'bookmarks' },
-    });
-    return response.data;
+    try {
+      const response = await axiosInstance.get('/posts/bookmarks', {
+        params: { page, limit },
+      });
+      return response.data;
+    } catch (fallbackError) {
+      const response = await axiosInstance.get('/posts/feed', {
+        params: { page, limit, only: 'bookmarks' },
+      });
+      return response.data;
+    }
   }
 };
 
@@ -78,7 +84,6 @@ export const createComment = async (postId, { body, image }) => {
   const formData = new FormData();
   const text = body?.trim();
   if (text) {
-    // Keep both keys for compatibility with different API payload parsers.
     formData.append('body', text);
     formData.append('content', text);
   }
@@ -143,7 +148,6 @@ export const getCommentReplies = async (postId, commentId, { page = 1, limit = 2
 export const createReply = async (postId, commentId, payload) => {
   const text = payload?.body || payload?.content || '';
   const response = await axiosInstance.post(`/posts/${postId}/comments/${commentId}/replies`, {
-    body: text,
     content: text,
   });
   return response.data;

@@ -41,31 +41,31 @@ function PostLikes() {
 
   return (
     <section className="space-y-4">
-      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <h1 className="text-xl font-bold text-slate-800">People who reacted</h1>
-          <Link className="text-sm font-medium text-slate-500 hover:text-indigo-600" to={`/posts/${postId}`}>
+      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-700 bg-slate-800 shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
+          <h1 className="text-xl font-bold text-white">People who reacted</h1>
+          <Link className="text-sm font-medium text-slate-400 hover:text-blue-400" to={`/posts/${postId}`}>
             Close
           </Link>
         </div>
 
         {users.length === 0 ? (
-          <div className="px-4 py-6 text-sm text-slate-600">No likes yet.</div>
+          <div className="px-4 py-6 text-sm text-slate-300">No likes yet.</div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-700">
             {users.map((user) => (
               <article key={user?._id || user?.id} className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   {user?.photo ? (
                     <img src={user.photo} alt={user?.name || 'User'} className="h-11 w-11 rounded-full object-cover" />
                   ) : (
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-slate-600">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-700 text-slate-300">
                       {user?.name?.[0] || 'U'}
                     </div>
                   )}
                   <div>
-                    <p className="font-medium text-slate-800">{user?.name || 'Unknown user'}</p>
-                    <p className="text-sm text-slate-500">@{user?.username || 'route-user'}</p>
+                    <p className="font-medium text-white">{user?.name || 'Unknown user'}</p>
+                    <p className="text-sm text-slate-400">@{user?.username || 'route-user'}</p>
                   </div>
                 </div>
               </article>

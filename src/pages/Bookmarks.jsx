@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Loader from '../components/Loader';
 import Pagination from '../components/Pagination';
 import PostCard from '../components/PostCard';
-import { getBookmarkedPosts, sharePost, toggleBookmark, togglePostLike } from '../api/postsApi';
+import { getBookmarkedPosts, toggleBookmark, togglePostLike } from '../api/postsApi';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { getErrorMessage, getUserId } from '../utils/errorMessage';
@@ -10,7 +10,7 @@ import { getErrorMessage, getUserId } from '../utils/errorMessage';
 function Bookmarks() {
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(20);
   const [hasNext, setHasNext] = useState(true);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -59,22 +59,13 @@ function Bookmarks() {
     }
   };
 
-  const share = async (postId) => {
-    try {
-      await sharePost(postId, 'Sharing this bookmarked post.');
-      showToast('success', 'Post shared successfully.');
-    } catch (error) {
-      showToast('error', getErrorMessage(error));
-    }
-  };
-
   if (loading) return <Loader text="Loading bookmarks..." />;
 
   return (
     <section className="space-y-4">
-      <h1 className="text-2xl font-bold text-slate-800">Bookmarked Posts</h1>
+      <h1 className="text-2xl font-bold text-white">Bookmarked Posts</h1>
       {posts.length === 0 ? (
-        <div className="card text-sm text-slate-600">You do not have bookmarked posts yet.</div>
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 text-sm text-slate-300">You do not have bookmarked posts yet.</div>
       ) : (
         posts.map((post) => (
           <PostCard
@@ -84,7 +75,7 @@ function Bookmarks() {
             onDelete={null}
             onLike={likePost}
             onBookmark={bookmarkPost}
-            onShare={share}
+            onUpdate={() => loadBookmarks(page)}
           />
         ))
       )}

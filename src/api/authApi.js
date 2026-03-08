@@ -94,3 +94,8 @@ export const getUserPostsById = async (userId, { page = 1, limit = 20 } = {}) =>
     meta: payload?.meta || {},
   };
 };
+
+export const toggleFollowUser = async (userId) => {
+  const response = await axiosInstance.put(`/users/${userId}/follow`);
+  return response.data;
+};

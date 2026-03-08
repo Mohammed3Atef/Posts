@@ -49,17 +49,17 @@ function ChangePassword() {
 
   return (
     <section className="mx-auto max-w-xl">
-      <div className="card">
-        <h1 className="mb-2 text-2xl font-bold text-slate-800">Change Password</h1>
-        <p className="mb-6 text-sm text-slate-500">Use a strong password with at least 6 characters.</p>
+      <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-sm">
+        <h1 className="mb-2 text-2xl font-bold text-white">Change Password</h1>
+        <p className="mb-6 text-sm text-slate-400">Use a strong password with at least 6 characters.</p>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="label" htmlFor="oldPassword">
+            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="oldPassword">
               Old Password
             </label>
             <input
-              className="input"
+              className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500"
               id="oldPassword"
               type="password"
               value={formData.oldPassword}
@@ -68,11 +68,11 @@ function ChangePassword() {
           </div>
 
           <div>
-            <label className="label" htmlFor="newPassword">
+            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="newPassword">
               New Password
             </label>
             <input
-              className="input"
+              className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500"
               id="newPassword"
               type="password"
               value={formData.newPassword}
@@ -81,11 +81,11 @@ function ChangePassword() {
           </div>
 
           <div>
-            <label className="label" htmlFor="rePassword">
+            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="rePassword">
               Confirm New Password
             </label>
             <input
-              className="input"
+              className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white outline-none transition focus:border-blue-500"
               id="rePassword"
               type="password"
               value={formData.rePassword}
@@ -93,7 +93,7 @@ function ChangePassword() {
             />
           </div>
 
-          <button className="btn-primary w-full py-2.5 text-sm disabled:opacity-50" disabled={loading}>
+          <button className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50" disabled={loading}>
             {loading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
