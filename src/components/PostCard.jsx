@@ -26,6 +26,7 @@ function PostCard({ post, currentUserId, onDelete, onLike, onBookmark, onShare, 
   const [shareOpen, setShareOpen] = useState(false);
   const [shareBody, setShareBody] = useState('');
   const [sharing, setSharing] = useState(false);
+  const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [comments, setComments] = useState([]);
@@ -63,17 +64,18 @@ function PostCard({ post, currentUserId, onDelete, onLike, onBookmark, onShare, 
   }, [menuOpen]);
 
   useEffect(() => {
-    if (!shareOpen) return () => {};
+    if (!shareOpen && !imagePreviewOpen) return () => {};
 
     const handleEscape = (event) => {
       if (event.key === 'Escape') {
         setShareOpen(false);
+        setImagePreviewOpen(false);
       }
     };
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [shareOpen]);
+  }, [shareOpen, imagePreviewOpen]);
 
   useEffect(() => {
     if (isEditing) {
@@ -338,7 +340,12 @@ function PostCard({ post, currentUserId, onDelete, onLike, onBookmark, onShare, 
       )}
 
       {imageUrl ? (
-        <img src={imageUrl} alt="Post" className="mb-3 max-h-80 w-full rounded-xl object-cover" />
+        <img
+          src={imageUrl}
+          alt="Post"
+          className="mb-3 max-h-80 w-full cursor-zoom-in rounded-xl object-cover"
+          onClick={() => setImagePreviewOpen(true)}
+        />
       ) : null}
 
       {sharedPost ? (
@@ -367,24 +374,37 @@ function PostCard({ post, currentUserId, onDelete, onLike, onBookmark, onShare, 
 
       <div className="mt-2 grid grid-cols-3 gap-2 border-t border-slate-700 pt-2">
         <button
-          className="rounded-lg px-2 py-1.5 text-sm text-slate-200 transition hover:bg-slate-700"
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-slate-200 transition hover:bg-slate-700"
           onClick={() => {
             if (!postId) return;
             onLike?.(postId);
           }}
         >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M12 20s-6.5-3.8-8.5-7.2c-1.2-2-1-4.9 1.2-6.4 2.1-1.5 4.7-.9 6.2.9.5.6.8 1.1 1.1 1.7.3-.6.6-1.1 1.1-1.7 1.5-1.8 4.1-2.4 6.2-.9 2.2 1.5 2.4 4.4 1.2 6.4C18.5 16.2 12 20 12 20Z" />
+          </svg>
           Like
         </button>
-        <button className="rounded-lg px-2 py-1.5 text-sm text-slate-200 transition hover:bg-slate-700" onClick={toggleCommentsPanel}>
+        <button
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-slate-200 transition hover:bg-slate-700"
+          onClick={toggleCommentsPanel}
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5v-7Z" />
+          </svg>
           Comment
         </button>
         <button
-          className="rounded-lg px-2 py-1.5 text-sm text-slate-200 transition hover:bg-slate-700"
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-slate-200 transition hover:bg-slate-700"
           onClick={() => {
             setShareBody('');
             setShareOpen(true);
           }}
         >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M15 8l5-5M20 3h-4M20 3v4" />
+            <path d="M14 10H8a4 4 0 0 0-4 4v5h12a4 4 0 0 0 4-4v-3" />
+          </svg>
           Share
         </button>
       </div>
@@ -470,6 +490,26 @@ function PostCard({ post, currentUserId, onDelete, onLike, onBookmark, onShare, 
               </button>
             </div>
           </div>
+        </div>
+      ) : null}
+
+      {imagePreviewOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4"
+          onClick={() => setImagePreviewOpen(false)}
+        >
+          <button
+            className="absolute right-4 top-4 rounded-full border border-slate-600 bg-slate-800 px-3 py-1 text-sm text-white transition hover:bg-slate-700"
+            onClick={() => setImagePreviewOpen(false)}
+          >
+            Close
+          </button>
+          <img
+            src={imageUrl}
+            alt="Post preview"
+            className="max-h-[90vh] w-auto max-w-full rounded-xl object-contain"
+            onClick={(event) => event.stopPropagation()}
+          />
         </div>
       ) : null}
 

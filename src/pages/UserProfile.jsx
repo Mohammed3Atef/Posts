@@ -1,16 +1,20 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Loader from '../components/Loader';
-import { getUserPostsById, getUserProfileById, toggleFollowUser } from '../api/authApi';
-import { toggleBookmark, togglePostLike } from '../api/postsApi';
-import PostCard from '../components/PostCard';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { getErrorMessage, getUserId } from '../utils/errorMessage';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Loader from "../components/Loader";
+import {
+  getUserPostsById,
+  getUserProfileById,
+  toggleFollowUser,
+} from "../api/authApi";
+import { toggleBookmark, togglePostLike } from "../api/postsApi";
+import PostCard from "../components/PostCard";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { getErrorMessage, getUserId } from "../utils/errorMessage";
 
 function UserProfile() {
   const fallbackAvatar =
-    'https://pub-3cba56bacf9f4965bbb0989e07dada12.r2.dev/linkedPosts/default-profile.png';
+    "https://pub-3cba56bacf9f4965bbb0989e07dada12.r2.dev/linkedPosts/default-profile.png";
   const { userId } = useParams();
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -34,16 +38,20 @@ function UserProfile() {
       setIsFollowing(
         Boolean(
           profileResult?.data?.isFollowing ??
-            profileResult?.isFollowing ??
-            profileResult?.data?.user?.isFollowing ??
-            data?.isFollowing
-        )
+          profileResult?.isFollowing ??
+          profileResult?.data?.user?.isFollowing ??
+          data?.isFollowing,
+        ),
       );
 
-      const posts = postsResult?.data?.posts || postsResult?.posts || postsResult?.data || [];
+      const posts =
+        postsResult?.data?.posts ||
+        postsResult?.posts ||
+        postsResult?.data ||
+        [];
       setUserPosts(Array.isArray(posts) ? posts : []);
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -56,20 +64,20 @@ function UserProfile() {
   const handleLike = async (postId) => {
     try {
       await togglePostLike(postId);
-      showToast('success', 'Like status updated.');
+      showToast("success", "Like status updated.");
       await loadUserProfile();
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     }
   };
 
   const handleBookmark = async (postId) => {
     try {
       await toggleBookmark(postId);
-      showToast('success', 'Bookmark status updated.');
+      showToast("success", "Bookmark status updated.");
       await loadUserProfile();
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     }
   };
 
@@ -85,9 +93,11 @@ function UserProfile() {
 
   const formattedBirthDate = userProfile?.dateOfBirth
     ? new Date(userProfile.dateOfBirth).toLocaleDateString()
-    : '-';
+    : "-";
   const viewedUserId = userProfile?._id || userProfile?.id;
-  const canFollow = Boolean(currentUserId && viewedUserId && currentUserId !== viewedUserId);
+  const canFollow = Boolean(
+    currentUserId && viewedUserId && currentUserId !== viewedUserId,
+  );
 
   const handleFollowToggle = async () => {
     if (!viewedUserId) return;
@@ -95,10 +105,10 @@ function UserProfile() {
     try {
       await toggleFollowUser(viewedUserId);
       setIsFollowing((prev) => !prev);
-      showToast('success', 'Follow status updated.');
+      showToast("success", "Follow status updated.");
       await loadUserProfile();
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     } finally {
       setFollowLoading(false);
     }
@@ -112,7 +122,7 @@ function UserProfile() {
           style={{
             backgroundImage: userProfile?.cover
               ? `url(${userProfile.cover})`
-              : 'linear-gradient(to right, #0f172a, #3b82f6)',
+              : "linear-gradient(to right, #0f172a, #3b82f6)",
           }}
         />
         <div className="relative px-4 pb-4">
@@ -120,15 +130,19 @@ function UserProfile() {
             <div className="flex items-start gap-4">
               <img
                 src={userProfile?.photo || fallbackAvatar}
-                alt={userProfile?.name || 'User'}
+                alt={userProfile?.name || "User"}
                 className="h-20 w-20 rounded-full border-4 border-slate-800 object-cover shadow-sm"
                 onError={(event) => {
                   event.currentTarget.src = fallbackAvatar;
                 }}
               />
               <div>
-                <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl">{userProfile?.name || '-'}</h1>
-                <p className="mt-1 text-lg text-slate-400 sm:text-2xl">@{userProfile?.username || 'user'}</p>
+                <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl">
+                  {userProfile?.name || "-"}
+                </h1>
+                <p className="mt-1 text-lg text-slate-400 sm:text-2xl">
+                  @{userProfile?.username || "user"}
+                </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <span className="inline-flex rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-300">
                     Route Posts member
@@ -139,7 +153,11 @@ function UserProfile() {
                       onClick={handleFollowToggle}
                       disabled={followLoading}
                     >
-                      {followLoading ? 'Saving...' : isFollowing ? 'Following' : 'Follow'}
+                      {followLoading
+                        ? "Saving..."
+                        : isFollowing
+                          ? "Following"
+                          : "Follow"}
                     </button>
                   ) : null}
                 </div>
@@ -149,15 +167,21 @@ function UserProfile() {
             <div className="grid w-full gap-2 sm:grid-cols-3 md:w-auto">
               <div className="rounded-lg border border-slate-700 px-4 py-2 text-center">
                 <p className="text-[11px] text-slate-400">Followers</p>
-                <p className="text-xl font-bold text-white">{userProfile?.followersCount || 0}</p>
+                <p className="text-xl font-bold text-white">
+                  {userProfile?.followersCount || 0}
+                </p>
               </div>
               <div className="rounded-lg border border-slate-700 px-4 py-2 text-center">
                 <p className="text-[11px] text-slate-400">Following</p>
-                <p className="text-xl font-bold text-white">{userProfile?.followingCount || 0}</p>
+                <p className="text-xl font-bold text-white">
+                  {userProfile?.followingCount || 0}
+                </p>
               </div>
               <div className="rounded-lg border border-slate-700 px-4 py-2 text-center">
                 <p className="text-[11px] text-slate-400">Bookmarks</p>
-                <p className="text-xl font-bold text-white">{userProfile?.bookmarksCount || 0}</p>
+                <p className="text-xl font-bold text-white">
+                  {userProfile?.bookmarksCount || 0}
+                </p>
               </div>
             </div>
           </div>
@@ -165,9 +189,9 @@ function UserProfile() {
           <div className="mt-4 rounded-xl border border-slate-700 bg-slate-800 p-4">
             <h2 className="mb-2 text-sm font-semibold text-white">About</h2>
             <div className="space-y-1 text-sm text-slate-300">
-              <p>{userProfile?.email || '-'}</p>
+              <p>{userProfile?.email || "-"}</p>
               <p>
-                {userProfile?.gender || '-'} - {formattedBirthDate}
+                {userProfile?.gender || "-"} - {formattedBirthDate}
               </p>
               <p>Active on Route Posts</p>
             </div>
@@ -179,7 +203,9 @@ function UserProfile() {
         <h2 className="text-lg font-semibold text-white">Posts</h2>
         {userPosts.length === 0 ? (
           <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
-            <p className="text-sm text-slate-300">No public posts found for this user yet.</p>
+            <p className="text-sm text-slate-300">
+              No public posts found for this user yet.
+            </p>
           </div>
         ) : (
           userPosts.map((post) => (

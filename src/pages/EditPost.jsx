@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { updatePost } from '../api/postsApi';
-import { useToast } from '../context/ToastContext';
-import { getErrorMessage } from '../utils/errorMessage';
+import { useMemo, useState } from "react";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { updatePost } from "../api/postsApi";
+import { useToast } from "../context/ToastContext";
+import { getErrorMessage } from "../utils/errorMessage";
 
 function EditPost() {
   const { postId } = useParams();
@@ -10,7 +10,7 @@ function EditPost() {
   const navigate = useNavigate();
   const post = useMemo(() => state?.post || null, [state]);
 
-  const [body, setBody] = useState(post?.body || '');
+  const [body, setBody] = useState(post?.body || "");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
@@ -19,17 +19,17 @@ function EditPost() {
     event.preventDefault();
 
     if (!body.trim()) {
-      showToast('error', 'Post body is required.');
+      showToast("error", "Post body is required.");
       return;
     }
 
     setLoading(true);
     try {
       await updatePost(postId, { body: body.trim(), image });
-      showToast('success', 'Post updated successfully.');
-      navigate('/');
+      showToast("success", "Post updated successfully.");
+      navigate("/");
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -41,13 +41,17 @@ function EditPost() {
         <h1 className="mb-2 text-2xl font-bold text-white">Edit Post</h1>
         {!post ? (
           <p className="mb-4 rounded-lg border border-amber-700 bg-amber-900/40 p-3 text-sm text-amber-200">
-            Post preview was not passed from Home page. You can still submit new text to update the post.
+            Post preview was not passed from Home page. You can still submit new
+            text to update the post.
           </p>
         ) : null}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="body">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="body"
+            >
               Post Content
             </label>
             <textarea
@@ -60,7 +64,10 @@ function EditPost() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="image">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="image"
+            >
               Optional New Image
             </label>
             <input
@@ -73,10 +80,16 @@ function EditPost() {
           </div>
 
           <div className="flex gap-2">
-            <button className="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50" disabled={loading}>
-              {loading ? 'Updating...' : 'Update Post'}
+            <button
+              className="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50"
+              disabled={loading}
+            >
+              {loading ? "Updating..." : "Update Post"}
             </button>
-            <Link className="rounded-lg border border-slate-600 bg-slate-700 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-600" to="/">
+            <Link
+              className="rounded-lg border border-slate-600 bg-slate-700 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-600"
+              to="/"
+            >
               Cancel
             </Link>
           </div>

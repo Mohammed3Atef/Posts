@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { changePassword } from '../api/authApi';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { getErrorMessage } from '../utils/errorMessage';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { changePassword } from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { getErrorMessage } from "../utils/errorMessage";
 
 function ChangePassword() {
   const [formData, setFormData] = useState({
-    oldPassword: '',
-    newPassword: '',
-    rePassword: '',
+    oldPassword: "",
+    newPassword: "",
+    rePassword: "",
   });
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -20,12 +20,12 @@ function ChangePassword() {
     event.preventDefault();
 
     if (formData.newPassword.length < 6) {
-      showToast('error', 'New password must be at least 6 characters.');
+      showToast("error", "New password must be at least 6 characters.");
       return;
     }
 
     if (formData.newPassword !== formData.rePassword) {
-      showToast('error', 'Passwords do not match.');
+      showToast("error", "Passwords do not match.");
       return;
     }
 
@@ -38,10 +38,10 @@ function ChangePassword() {
         await login(newToken);
       }
 
-      showToast('success', 'Password changed successfully.');
-      navigate('/profile');
+      showToast("success", "Password changed successfully.");
+      navigate("/profile");
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -51,11 +51,16 @@ function ChangePassword() {
     <section className="mx-auto max-w-xl">
       <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-sm">
         <h1 className="mb-2 text-2xl font-bold text-white">Change Password</h1>
-        <p className="mb-6 text-sm text-slate-400">Use a strong password with at least 6 characters.</p>
+        <p className="mb-6 text-sm text-slate-400">
+          Use a strong password with at least 6 characters.
+        </p>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="oldPassword">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="oldPassword"
+            >
               Old Password
             </label>
             <input
@@ -63,12 +68,20 @@ function ChangePassword() {
               id="oldPassword"
               type="password"
               value={formData.oldPassword}
-              onChange={(event) => setFormData((prev) => ({ ...prev, oldPassword: event.target.value }))}
+              onChange={(event) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  oldPassword: event.target.value,
+                }))
+              }
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="newPassword">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="newPassword"
+            >
               New Password
             </label>
             <input
@@ -76,12 +89,20 @@ function ChangePassword() {
               id="newPassword"
               type="password"
               value={formData.newPassword}
-              onChange={(event) => setFormData((prev) => ({ ...prev, newPassword: event.target.value }))}
+              onChange={(event) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  newPassword: event.target.value,
+                }))
+              }
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="rePassword">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="rePassword"
+            >
               Confirm New Password
             </label>
             <input
@@ -89,12 +110,20 @@ function ChangePassword() {
               id="rePassword"
               type="password"
               value={formData.rePassword}
-              onChange={(event) => setFormData((prev) => ({ ...prev, rePassword: event.target.value }))}
+              onChange={(event) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  rePassword: event.target.value,
+                }))
+              }
             />
           </div>
 
-          <button className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50" disabled={loading}>
-            {loading ? 'Updating...' : 'Update Password'}
+          <button
+            className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Update Password"}
           </button>
         </form>
       </div>

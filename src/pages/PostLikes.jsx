@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import Loader from '../components/Loader';
-import Pagination from '../components/Pagination';
-import { getPostLikes } from '../api/postsApi';
-import { useToast } from '../context/ToastContext';
-import { getErrorMessage } from '../utils/errorMessage';
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import Loader from "../components/Loader";
+import Pagination from "../components/Pagination";
+import { getPostLikes } from "../api/postsApi";
+import { useToast } from "../context/ToastContext";
+import { getErrorMessage } from "../utils/errorMessage";
 
 function PostLikes() {
   const { postId } = useParams();
@@ -27,7 +27,7 @@ function PostLikes() {
       setHasNext(currentPage < numberOfPages);
       setPage(currentPage);
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -44,7 +44,10 @@ function PostLikes() {
       <div className="mx-auto w-full max-w-2xl rounded-2xl border border-slate-700 bg-slate-800 shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
           <h1 className="text-xl font-bold text-white">People who reacted</h1>
-          <Link className="text-sm font-medium text-slate-400 hover:text-blue-400" to={`/posts/${postId}`}>
+          <Link
+            className="text-sm font-medium text-slate-400 hover:text-blue-400"
+            to={`/posts/${postId}`}
+          >
             Close
           </Link>
         </div>
@@ -57,15 +60,23 @@ function PostLikes() {
               <article key={user?._id || user?.id} className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   {user?.photo ? (
-                    <img src={user.photo} alt={user?.name || 'User'} className="h-11 w-11 rounded-full object-cover" />
+                    <img
+                      src={user.photo}
+                      alt={user?.name || "User"}
+                      className="h-11 w-11 rounded-full object-cover"
+                    />
                   ) : (
                     <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-700 text-slate-300">
-                      {user?.name?.[0] || 'U'}
+                      {user?.name?.[0] || "U"}
                     </div>
                   )}
                   <div>
-                    <p className="font-medium text-white">{user?.name || 'Unknown user'}</p>
-                    <p className="text-sm text-slate-400">@{user?.username || 'route-user'}</p>
+                    <p className="font-medium text-white">
+                      {user?.name || "Unknown user"}
+                    </p>
+                    <p className="text-sm text-slate-400">
+                      @{user?.username || "route-user"}
+                    </p>
                   </div>
                 </div>
               </article>
@@ -75,7 +86,12 @@ function PostLikes() {
       </div>
 
       {users.length > 0 ? (
-        <Pagination page={page} onPageChange={loadLikes} hasNext={hasNext} canGoBack={page > 1} />
+        <Pagination
+          page={page}
+          onPageChange={loadLikes}
+          hasNext={hasNext}
+          canGoBack={page > 1}
+        />
       ) : null}
     </section>
   );

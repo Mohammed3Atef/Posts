@@ -1,12 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import ConfirmDialog from '../components/ConfirmDialog';
-import Loader from '../components/Loader';
-import PostCard from '../components/PostCard';
-import { deletePost, getPostDetails, toggleBookmark, togglePostLike } from '../api/postsApi';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { getErrorMessage, getUserId } from '../utils/errorMessage';
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import ConfirmDialog from "../components/ConfirmDialog";
+import Loader from "../components/Loader";
+import PostCard from "../components/PostCard";
+import {
+  deletePost,
+  getPostDetails,
+  toggleBookmark,
+  togglePostLike,
+} from "../api/postsApi";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { getErrorMessage, getUserId } from "../utils/errorMessage";
 
 function PostDetails() {
   const { postId } = useParams();
@@ -17,7 +22,7 @@ function PostDetails() {
   const currentUserId = getUserId(user);
   const [post, setPost] = useState(state?.post || null);
   const [loading, setLoading] = useState(true);
-  const [deletingPostId, setDeletingPostId] = useState('');
+  const [deletingPostId, setDeletingPostId] = useState("");
 
   const loadPost = async () => {
     setLoading(true);
@@ -26,7 +31,7 @@ function PostDetails() {
       setPost(result?.data || result?.post || state?.post || null);
     } catch (error) {
       setPost(state?.post || null);
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -39,20 +44,20 @@ function PostDetails() {
   const handlePostLike = async (targetPostId) => {
     try {
       await togglePostLike(targetPostId);
-      showToast('success', 'Like status updated.');
+      showToast("success", "Like status updated.");
       await loadPost();
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     }
   };
 
   const handlePostBookmark = async (targetPostId) => {
     try {
       await toggleBookmark(targetPostId);
-      showToast('success', 'Bookmark status updated.');
+      showToast("success", "Bookmark status updated.");
       await loadPost();
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     }
   };
 
@@ -60,12 +65,12 @@ function PostDetails() {
     if (!deletingPostId) return;
     try {
       await deletePost(deletingPostId);
-      showToast('success', 'Post deleted successfully.');
-      navigate('/');
+      showToast("success", "Post deleted successfully.");
+      navigate("/");
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     } finally {
-      setDeletingPostId('');
+      setDeletingPostId("");
     }
   };
 
@@ -75,7 +80,10 @@ function PostDetails() {
 
   return (
     <section className="space-y-4">
-      <Link to="/" className="inline-block text-sm font-medium text-blue-400 hover:underline">
+      <Link
+        to="/"
+        className="inline-block text-sm font-medium text-blue-400 hover:underline"
+      >
         Back to Home
       </Link>
 
@@ -90,7 +98,9 @@ function PostDetails() {
         />
       ) : (
         <article className="rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm">
-          <h1 className="text-lg font-semibold text-white">Post details are unavailable.</h1>
+          <h1 className="text-lg font-semibold text-white">
+            Post details are unavailable.
+          </h1>
         </article>
       )}
 
@@ -99,7 +109,7 @@ function PostDetails() {
         title="Delete post"
         message="This post will be removed permanently."
         confirmText="Delete"
-        onCancel={() => setDeletingPostId('')}
+        onCancel={() => setDeletingPostId("")}
         onConfirm={handleDeletePost}
       />
     </section>

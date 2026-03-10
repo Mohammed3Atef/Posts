@@ -32,6 +32,8 @@ function Home() {
   const [deletePostId, setDeletePostId] = useState("");
   const [followLoadingId, setFollowLoadingId] = useState("");
   const [followingMap, setFollowingMap] = useState({});
+  const [mobileSuggestionsOpen, setMobileSuggestionsOpen] = useState(false);
+  const [suggestionSearch, setSuggestionSearch] = useState("");
   const [composerBody, setComposerBody] = useState("");
   const [composerImage, setComposerImage] = useState(null);
   const [posting, setPosting] = useState(false);
@@ -43,6 +45,13 @@ function Home() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const currentUserId = getUserId(user);
+  const filteredSuggestions = suggestions.filter((item) => {
+    const name = (item?.name || "").toLowerCase();
+    const username = (item?.username || "").toLowerCase();
+    const query = suggestionSearch.trim().toLowerCase();
+    if (!query) return true;
+    return name.includes(query) || username.includes(query);
+  });
 
   const loadPosts = async (selectedPage = 1, onlyValue = feedOnly) => {
     setLoading(true);
@@ -74,10 +83,14 @@ function Home() {
         [];
       const nextPosts =
         onlyValue === "saved"
-          ? (Array.isArray(bookmarkPosts) ? bookmarkPosts : [])
-          : (Array.isArray(result?.data?.posts || result?.posts || result?.data || [])
-            ? (result?.data?.posts || result?.posts || result?.data || [])
-            : []);
+          ? Array.isArray(bookmarkPosts)
+            ? bookmarkPosts
+            : []
+          : Array.isArray(
+                result?.data?.posts || result?.posts || result?.data || [],
+              )
+            ? result?.data?.posts || result?.posts || result?.data || []
+            : [];
       const numberOfPages = result?.meta?.pagination?.numberOfPages || 1;
       const currentPage = result?.meta?.pagination?.currentPage || selectedPage;
 
@@ -206,11 +219,15 @@ function Home() {
   return (
     <section className="space-y-4">
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[220px_minmax(0,1fr)_300px]">
-        <aside className="sticky top-20 hidden h-fit self-start rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm xl:block">
-          <h2 className="mb-3 text-sm font-semibold text-white">
+        <aside className="h-fit rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm xl:sticky xl:top-20 xl:self-start">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
+            <svg viewBox="0 0 24 24" className="h-4 w-4 text-blue-400" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <rect x="4" y="4" width="16" height="16" rx="2" />
+              <path d="M8 8h8M8 12h8M8 16h5" />
+            </svg>
             Feed Sections
           </h2>
-          <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-2 xl:grid-cols-1">
             <button
               className={`w-full rounded-lg px-3 py-2 text-left text-sm transition ${
                 feedOnly === "following"
@@ -222,7 +239,13 @@ function Home() {
                 loadPosts(1, "following");
               }}
             >
-              Feed
+              <span className="inline-flex items-center gap-2">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                  <path d="M8 8h8M8 12h8M8 16h5" />
+                </svg>
+                Feed
+              </span>
             </button>
             <button
               className={`w-full rounded-lg px-3 py-2 text-left text-sm transition ${
@@ -235,7 +258,13 @@ function Home() {
                 loadPosts(1, "me");
               }}
             >
-              My Posts
+              <span className="inline-flex items-center gap-2">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M12 3v4M5.5 6.5l2.8 2.8M3 13h4M5.5 19.5l2.8-2.8M12 21v-4M18.5 19.5l-2.8-2.8M21 13h-4M18.5 6.5l-2.8 2.8" />
+                  <circle cx="12" cy="13" r="2.5" />
+                </svg>
+                My Posts
+              </span>
             </button>
             <button
               className={`w-full rounded-lg px-3 py-2 text-left text-sm transition ${
@@ -248,7 +277,13 @@ function Home() {
                 loadPosts(1, "all");
               }}
             >
-              Community
+              <span className="inline-flex items-center gap-2">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <circle cx="12" cy="12" r="8" />
+                  <path d="M4 12h16M12 4a12 12 0 0 1 0 16M12 4a12 12 0 0 0 0 16" />
+                </svg>
+                Community
+              </span>
             </button>
             <button
               className={`w-full rounded-lg px-3 py-2 text-left text-sm transition ${
@@ -261,11 +296,108 @@ function Home() {
                 loadPosts(1, "saved");
               }}
             >
-              Saved
+              <span className="inline-flex items-center gap-2">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M7 4h10a1 1 0 0 1 1 1v15l-6-3-6 3V5a1 1 0 0 1 1-1Z" />
+                </svg>
+                Saved
+              </span>
             </button>
           </div>
         </aside>
-
+        <aside className="md:hidden h-fit rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm xl:sticky xl:top-20 xl:self-start">
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-white">
+              <svg viewBox="0 0 24 24" className="h-4 w-4 text-blue-400" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <circle cx="8" cy="8" r="3" />
+                <path d="M2.5 19a5.5 5.5 0 0 1 11 0" />
+                <circle cx="17" cy="7.5" r="2.5" />
+                <path d="M14 18a4.5 4.5 0 0 1 7 0" />
+              </svg>
+              Suggested Friends
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="rounded-md bg-slate-700 px-2 py-0.5 text-xs text-slate-300">
+                {suggestions.length}
+              </span>
+              <button
+                type="button"
+                className="text-xs font-medium text-blue-400 hover:text-blue-300 xl:hidden"
+                onClick={() => setMobileSuggestionsOpen((prev) => !prev)}
+              >
+                {mobileSuggestionsOpen ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
+          <div
+            className={`${mobileSuggestionsOpen ? "block" : "hidden"} space-y-3 xl:block`}
+          >
+            <input
+              type="text"
+              className="w-full rounded-lg border mt-3 border-slate-600 bg-slate-700 px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500"
+              placeholder="Search friends..."
+              value={suggestionSearch}
+              onChange={(event) => setSuggestionSearch(event.target.value)}
+            />
+            {filteredSuggestions.slice(0, 5).map((item) => {
+              const suggestionId = item?._id || item?.id;
+              return (
+                <div
+                  key={suggestionId}
+                  className="cursor-pointer rounded-lg border border-slate-700 p-2 transition hover:bg-slate-700"
+                  onClick={() =>
+                    suggestionId && navigate(`/users/${suggestionId}/profile`)
+                  }
+                >
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={item?.photo || fallbackAvatar}
+                      alt={item?.name || "User"}
+                      className="h-9 w-9 rounded-full object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-white">
+                        {item?.name || "User"}
+                      </p>
+                      <p className="truncate text-xs text-slate-400">
+                        @{item?.username || "route-user"}
+                      </p>
+                    </div>
+                    <button
+                      className="rounded-lg border border-slate-600 bg-slate-700 px-2 py-1 text-xs font-medium text-slate-200 transition hover:bg-slate-600"
+                      onClick={(event) =>
+                        handleFollowToggle(event, item?._id || item?.id)
+                      }
+                    >
+                      {followLoadingId === (item?._id || item?.id)
+                        ? "Saving..."
+                        : followingMap[item?._id || item?.id]
+                          ? "Following"
+                          : "Follow"}
+                    </button>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-400">
+                    {item?.followersCount || 0} followers
+                  </p>
+                </div>
+              );
+            })}
+            {filteredSuggestions.length > 5 ? (
+              <button
+                type="button"
+                className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-600"
+                onClick={() => navigate("/suggestions")}
+              >
+                View more
+              </button>
+            ) : null}
+            {filteredSuggestions.length === 0 ? (
+              <p className="text-xs text-slate-400">
+                No suggestions right now.
+              </p>
+            ) : null}
+          </div>
+        </aside>
         <div className="space-y-4">
           <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm">
             <div className="mb-3 flex items-center gap-3">
@@ -294,25 +426,39 @@ function Home() {
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={(event) => setComposerImage(event.target.files?.[0] || null)}
+              onChange={(event) =>
+                setComposerImage(event.target.files?.[0] || null)
+              }
             />
             {composerImage ? (
-              <p className="mt-2 text-xs text-slate-300">Selected image: {composerImage.name}</p>
+              <p className="mt-2 text-xs text-slate-300">
+                Selected image: {composerImage.name}
+              </p>
             ) : null}
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-xs text-slate-400">
                 <button
                   type="button"
-                  className="rounded-md px-2 py-1 transition hover:bg-slate-700 hover:text-white"
+                  className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 transition hover:bg-slate-700 hover:text-white"
                   onClick={() => imageInputRef.current?.click()}
                 >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <rect x="4" y="5" width="16" height="14" rx="2" />
+                    <circle cx="9" cy="10" r="1.5" />
+                    <path d="M7 16l3.5-3.5 2.5 2.5 2.5-2.5 1.5 1.5" />
+                  </svg>
                   Photo/video
                 </button>
                 <button
                   type="button"
-                  className="rounded-md px-2 py-1 transition hover:bg-slate-700 hover:text-white"
+                  className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 transition hover:bg-slate-700 hover:text-white"
                   onClick={() => setFeelingModalOpen(true)}
                 >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <circle cx="12" cy="12" r="8" />
+                    <path d="M9 10h.01M15 10h.01" />
+                    <path d="M8.5 14a4.5 4.5 0 0 0 7 0" />
+                  </svg>
                   Feeling/activity
                 </button>
               </div>
@@ -359,17 +505,41 @@ function Home() {
           ) : null}
         </div>
 
-        <aside className="sticky top-20 hidden h-fit self-start rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm lg:block">
+        <aside className="hidden md:block h-fit rounded-2xl border border-slate-700 bg-slate-800 p-4 shadow-sm xl:sticky xl:top-20 xl:self-start">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-white">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-white">
+              <svg viewBox="0 0 24 24" className="h-4 w-4 text-blue-400" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <circle cx="8" cy="8" r="3" />
+                <path d="M2.5 19a5.5 5.5 0 0 1 11 0" />
+                <circle cx="17" cy="7.5" r="2.5" />
+                <path d="M14 18a4.5 4.5 0 0 1 7 0" />
+              </svg>
               Suggested Friends
             </h2>
-            <span className="rounded-md bg-slate-700 px-2 py-0.5 text-xs text-slate-300">
-              {suggestions.length}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="rounded-md bg-slate-700 px-2 py-0.5 text-xs text-slate-300">
+                {suggestions.length}
+              </span>
+              <button
+                type="button"
+                className="text-xs font-medium text-blue-400 hover:text-blue-300 xl:hidden"
+                onClick={() => setMobileSuggestionsOpen((prev) => !prev)}
+              >
+                {mobileSuggestionsOpen ? "Hide" : "Show"}
+              </button>
+            </div>
           </div>
-          <div className="space-y-3">
-            {suggestions.map((item) => {
+          <div
+            className={`${mobileSuggestionsOpen ? "block" : "hidden"} space-y-3 xl:block`}
+          >
+            <input
+              type="text"
+              className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500"
+              placeholder="Search friends..."
+              value={suggestionSearch}
+              onChange={(event) => setSuggestionSearch(event.target.value)}
+            />
+            {filteredSuggestions.slice(0, 5).map((item) => {
               const suggestionId = item?._id || item?.id;
               return (
                 <div
@@ -402,8 +572,8 @@ function Home() {
                       {followLoadingId === (item?._id || item?.id)
                         ? "Saving..."
                         : followingMap[item?._id || item?.id]
-                        ? "Following"
-                        : "Follow"}
+                          ? "Following"
+                          : "Follow"}
                     </button>
                   </div>
                   <p className="mt-1 text-xs text-slate-400">
@@ -412,7 +582,16 @@ function Home() {
                 </div>
               );
             })}
-            {suggestions.length === 0 ? (
+            {filteredSuggestions.length > 5 ? (
+              <button
+                type="button"
+                className="w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-600"
+                onClick={() => navigate("/suggestions")}
+              >
+                View more
+              </button>
+            ) : null}
+            {filteredSuggestions.length === 0 ? (
               <p className="text-xs text-slate-400">
                 No suggestions right now.
               </p>

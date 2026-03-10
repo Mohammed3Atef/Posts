@@ -84,7 +84,6 @@ export const createComment = async (postId, { body, image }) => {
   const formData = new FormData();
   const text = body?.trim();
   if (text) {
-    formData.append('body', text);
     formData.append('content', text);
   }
   appendFileIfExists(formData, 'image', image);
@@ -97,7 +96,6 @@ export const updateComment = async (postId, commentId, { body, image }) => {
   const formData = new FormData();
   const text = body?.trim();
   if (text) {
-    formData.append('body', text);
     formData.append('content', text);
   }
   appendFileIfExists(formData, 'image', image);

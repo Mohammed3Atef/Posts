@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useEffect, useRef, useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
@@ -10,7 +10,7 @@ function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   useEffect(() => {
@@ -20,17 +20,22 @@ function Navbar() {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-700 bg-slate-900/95 backdrop-blur">
       <nav className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-2">
-        <Link to={isAuthenticated ? '/' : '/login'} className="flex items-center gap-2 text-lg font-bold text-white">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 text-xs text-white">RP</span>
+        <Link
+          to={isAuthenticated ? "/" : "/login"}
+          className="flex items-center gap-2 text-lg font-bold text-white"
+        >
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 text-xs text-white">
+            RP
+          </span>
           Route Posts
         </Link>
 
@@ -42,8 +47,8 @@ function Navbar() {
                   className={({ isActive }) =>
                     `rounded-full px-3 py-1.5 text-xs font-medium transition ${
                       isActive
-                        ? 'bg-slate-700 text-white'
-                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                        ? "bg-slate-700 text-white"
+                        : "text-slate-300 hover:bg-slate-700 hover:text-white"
                     }`
                   }
                   to="/"
@@ -54,8 +59,8 @@ function Navbar() {
                   className={({ isActive }) =>
                     `rounded-full px-3 py-1.5 text-xs font-medium transition ${
                       isActive
-                        ? 'bg-slate-700 text-white'
-                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                        ? "bg-slate-700 text-white"
+                        : "text-slate-300 hover:bg-slate-700 hover:text-white"
                     }`
                   }
                   to="/profile"
@@ -66,8 +71,8 @@ function Navbar() {
                   className={({ isActive }) =>
                     `rounded-full px-3 py-1.5 text-xs font-medium transition ${
                       isActive
-                        ? 'bg-slate-700 text-white'
-                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                        ? "bg-slate-700 text-white"
+                        : "text-slate-300 hover:bg-slate-700 hover:text-white"
                     }`
                   }
                   to="/notifications"
@@ -85,10 +90,12 @@ function Navbar() {
                 >
                   <img
                     src={user?.photo}
-                    alt={user?.name || 'User'}
+                    alt={user?.name || "User"}
                     className="h-7 w-7 rounded-full object-cover"
                   />
-                  <span className="text-sm font-medium text-slate-200">{user?.name || 'User'}</span>
+                  <span className="text-sm font-medium text-slate-200">
+                    {user?.name || "User"}
+                  </span>
                   <span className="text-slate-400">≡</span>
                 </button>
 
@@ -122,7 +129,10 @@ function Navbar() {
           </>
         ) : (
           <div className="flex items-center gap-3 text-sm">
-            <Link className="rounded-md px-3 py-1.5 text-slate-300 transition hover:bg-slate-800 hover:text-white" to="/login">
+            <Link
+              className="rounded-md px-3 py-1.5 text-slate-300 transition hover:bg-slate-800 hover:text-white"
+              to="/login"
+            >
               Login
             </Link>
             <Link

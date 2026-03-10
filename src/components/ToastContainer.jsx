@@ -1,9 +1,9 @@
-import { useToast } from '../context/ToastContext';
+import { useToast } from "../context/ToastContext";
 
 const toastColors = {
-  success: 'border-emerald-700 bg-emerald-900/40 text-emerald-200',
-  error: 'border-red-700 bg-red-900/40 text-red-200',
-  info: 'border-blue-700 bg-blue-900/40 text-blue-200',
+  success: "border-emerald-700 bg-emerald-900/40 text-emerald-200",
+  error: "border-red-700 bg-red-900/40 text-red-200",
+  info: "border-blue-700 bg-blue-900/40 text-blue-200",
 };
 
 function ToastContainer() {

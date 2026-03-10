@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { signupUser } from '../api/authApi';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { getErrorMessage } from '../utils/errorMessage';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { signupUser } from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { getErrorMessage } from "../utils/errorMessage";
 
 const initialForm = {
-  name: '',
-  email: '',
-  password: '',
-  rePassword: '',
-  dateOfBirth: '',
-  gender: 'male',
+  name: "",
+  email: "",
+  password: "",
+  rePassword: "",
+  dateOfBirth: "",
+  gender: "male",
 };
 
 function Signup() {
@@ -27,11 +27,14 @@ function Signup() {
   };
 
   const validateForm = () => {
-    if (!formData.name.trim() || !formData.email.trim()) return 'Name and email are required.';
-    if (formData.password.length < 6) return 'Password must be at least 6 characters.';
-    if (formData.password !== formData.rePassword) return 'Passwords do not match.';
-    if (!formData.dateOfBirth) return 'Date of birth is required.';
-    return '';
+    if (!formData.name.trim() || !formData.email.trim())
+      return "Name and email are required.";
+    if (formData.password.length < 6)
+      return "Password must be at least 6 characters.";
+    if (formData.password !== formData.rePassword)
+      return "Passwords do not match.";
+    if (!formData.dateOfBirth) return "Date of birth is required.";
+    return "";
   };
 
   const handleSubmit = async (event) => {
@@ -39,7 +42,7 @@ function Signup() {
     const validationError = validateForm();
 
     if (validationError) {
-      showToast('error', validationError);
+      showToast("error", validationError);
       return;
     }
 
@@ -51,14 +54,14 @@ function Signup() {
 
       if (token) {
         await login(token, user);
-        showToast('success', 'Account created successfully.');
-        navigate('/');
+        showToast("success", "Account created successfully.");
+        navigate("/");
       } else {
-        showToast('info', 'Account created. Please login now.');
-        navigate('/login');
+        showToast("info", "Account created. Please login now.");
+        navigate("/login");
       }
     } catch (error) {
-      showToast('error', getErrorMessage(error));
+      showToast("error", getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -68,11 +71,16 @@ function Signup() {
     <section className="mx-auto max-w-xl">
       <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 shadow-sm">
         <h1 className="mb-2 text-2xl font-bold text-white">Sign Up</h1>
-        <p className="mb-6 text-sm text-slate-400">Create your account to start posting.</p>
+        <p className="mb-6 text-sm text-slate-400">
+          Create your account to start posting.
+        </p>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="name">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="name"
+            >
               Name
             </label>
             <input
@@ -85,7 +93,10 @@ function Signup() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="email">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="email"
+            >
               Email
             </label>
             <input
@@ -99,7 +110,10 @@ function Signup() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="password">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="password"
+            >
               Password
             </label>
             <input
@@ -113,7 +127,10 @@ function Signup() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="rePassword">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="rePassword"
+            >
               Confirm Password
             </label>
             <input
@@ -127,7 +144,10 @@ function Signup() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="dateOfBirth">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="dateOfBirth"
+            >
               Date Of Birth
             </label>
             <input
@@ -141,7 +161,10 @@ function Signup() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-200" htmlFor="gender">
+            <label
+              className="mb-1.5 block text-sm font-medium text-slate-200"
+              htmlFor="gender"
+            >
               Gender
             </label>
             <select
@@ -156,14 +179,20 @@ function Signup() {
             </select>
           </div>
 
-          <button className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50" disabled={loading}>
-            {loading ? 'Creating account...' : 'Sign Up'}
+          <button
+            className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-50"
+            disabled={loading}
+          >
+            {loading ? "Creating account..." : "Sign Up"}
           </button>
         </form>
 
         <p className="mt-4 text-sm text-slate-300">
-          Already have an account?{' '}
-          <Link to="/login" className="font-medium text-blue-400 hover:underline">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="font-medium text-blue-400 hover:underline"
+          >
             Login
           </Link>
         </p>
